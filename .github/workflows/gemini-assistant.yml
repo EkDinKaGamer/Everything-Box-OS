@@ -1,0 +1,29 @@
+name: Gemini Assistant Workflow
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  gemini-response:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Send Prompt to Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # Example API request sending issue title/body to Gemini 2.5 Flash
+          ISSUE_TITLE="${{ github.event.issue.title || github.event.pull_request.title }}"
+          
+          curl -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{
+                  \"contents\": [{
+                    \"parts\": [{\"text\": \"You are a helpful assistant reviewing a GitHub issue. Title: ${ISSUE_TITLE}. Provide a quick analysis or acknowledgment.\"}]
+                  }]
+                }"
