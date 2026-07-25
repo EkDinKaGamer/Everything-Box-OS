@@ -1,16 +1,39 @@
 /*
-  Everything Box OS - Arduino Nano Core
-  Version: 0.1.0
-
-  Initial firmware skeleton.
+  Everything Box OS v1.0
+  Arduino Nano Main Firmware
 */
+
+#include "Config.h"
+#include "core/Scheduler.h"
+#include "modules/Input.h"
+#include "modules/RGB.h"
+#include "modules/Buzzer.h"
+#include "modules/ServoControl.h"
+
+void systemTask();
+
+EBOSTask systemTaskItem = {systemTask, 1000, 0};
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Everything Box OS Nano Core Started");
+
+  Input.begin();
+  RGB.begin();
+  Buzzer.begin();
+  ServoControl.begin();
+
+  Buzzer.beep(80);
+  Serial.println("EBOS v1.0 Started");
 }
 
 void loop() {
-  // Main EBOS scheduler will be added here.
-  delay(100);
+  Scheduler.run(systemTaskItem);
+
+  if (Input.pressed()) {
+    RGB.blue();
+  }
+}
+
+void systemTask() {
+  Serial.println("EBOS System Running");
 }
